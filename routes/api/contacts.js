@@ -29,11 +29,6 @@ router.get("/", async (req, res, next) => {
     });
   } catch (error) {
     next(error);
-    // res.status(500).json({
-    //   status: "error",
-    //   code: 500,
-    //   message: "Server error",
-    // });
   }
 });
 
@@ -47,12 +42,6 @@ router.get("/:contactId", async (req, res, next) => {
       error.status = 404;
       throw error;
     }
-    // res.status(404).json({
-    //   status: "error",
-    //   code: 404,
-    //   message: `Contact with id=${contactId} not found`,
-    // });
-    // return;
 
     res.status(200).json({
       status: "success",

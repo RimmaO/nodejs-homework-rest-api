@@ -9,6 +9,7 @@ const listContacts = async (req, res) => {
     skip,
     limit,
   }).populate("owner", "name email");
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -21,7 +22,6 @@ const listContacts = async (req, res) => {
 const getContactById = async (req, res) => {
   const { contactId } = req.params;
   const oneContact = await Contact.findById(contactId);
-
   if (!oneContact) {
     const error = new Error("Not found");
     error.status = 404;
@@ -45,6 +45,7 @@ const removeContact = async (req, res) => {
     error.status = 404;
     throw error;
   }
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -58,6 +59,7 @@ const removeContact = async (req, res) => {
 const addContact = async (req, res) => {
   const { _id: owner } = req.user;
   const newContact = await Contact.create({ ...req.body, owner });
+
   res.status(201).json({
     status: "success",
     code: 201,
@@ -77,6 +79,7 @@ const updateContact = async (req, res) => {
     error.status = 404;
     throw error;
   }
+
   res.status(200).json({
     status: "success",
     code: 200,
@@ -96,6 +99,7 @@ const updateFavorite = async (req, res) => {
     error.status = 404;
     throw error;
   }
+
   res.status(200).json({
     status: "success",
     code: 200,

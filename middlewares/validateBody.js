@@ -1,8 +1,3 @@
-// const { error } = contactsPutSchema.validate(req.body);
-// if (error) {
-//   error.status = 400;
-//   throw error;
-// }
 const validateBody = (schema) => {
   const func = (req, res, next) => {
     const { error } = schema.validate(req.body);

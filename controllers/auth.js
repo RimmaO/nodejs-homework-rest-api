@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
-const Jimp = require("jimp");
+// const Jimp = require("jimp");
 
 const { User } = require("../models/user");
 const { ctrlWrapper } = require("../helpers");
@@ -93,16 +93,16 @@ const updateAvatar = async (req, res) => {
   res.status(200).json({ avatarURL });
 };
 
-async function resize() {
-  const image = await Jimp.read(
-    "../public/avatars/650995ce15d948759502ef39_noname.jpg"
-  );
-  await image.resize(250, 250);
-  await image.writeAsync(
-    "../public/avatars/650995ce15d948759502ef39_noname-edit.jpg"
-  );
-}
-resize();
+// async function resize() {
+//   const image = await Jimp.read(
+//     "../public/avatars/650995ce15d948759502ef39_noname.jpg"
+//   );
+//   await image.resize(250, 250);
+//   await image.writeAsync(
+//     "../public/avatars/650995ce15d948759502ef39_noname-edit.jpg"
+//   );
+// }
+// resize();
 
 module.exports = {
   register: ctrlWrapper(register),

@@ -7,7 +7,7 @@ const { schemas } = require("../../models/contact");
 router.get(
   "/",
   authenticate,
-  // validateBody(schemas.contactFilterFavoriteSchema),
+
   ctrl.listContacts
 );
 

@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const gravatar = require("gravatar");
 const path = require("path");
 const fs = require("fs/promises");
-// const Jimp = require("jimp");
+const Jimp = require("jimp");
 
 const { User } = require("../models/user");
 const { ctrlWrapper } = require("../helpers");
@@ -83,8 +83,15 @@ const current = async (req, res) => {
 const updateAvatar = async (req, res) => {
   const { _id } = req.user;
   const { path: tempUpload, originalname } = req.file;
+
+  Jimp.read(tempUpload)
+    .then((avatar) => {
+      return avatar.resize(250, 250).write(resultUpload);
+    })
+    .catch((error) => {
+      console.log(error.message);
+    });
   const filename = `${_id}_${originalname}`;
-  // console.log(filename);
   const resultUpload = path.join(avatarsDir, filename);
   await fs.rename(tempUpload, resultUpload);
   const avatarURL = path.join("avatars", filename);
@@ -92,17 +99,6 @@ const updateAvatar = async (req, res) => {
 
   res.status(200).json({ avatarURL });
 };
-
-// async function resize() {
-//   const image = await Jimp.read(
-//     "../public/avatars/650995ce15d948759502ef39_noname.jpg"
-//   );
-//   await image.resize(250, 250);
-//   await image.writeAsync(
-//     "../public/avatars/650995ce15d948759502ef39_noname-edit.jpg"
-//   );
-// }
-// resize();
 
 module.exports = {
   register: ctrlWrapper(register),

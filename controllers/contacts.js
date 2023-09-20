@@ -2,30 +2,32 @@ const { Contact } = require("../models/contact");
 const { ctrlWrapper } = require("../helpers");
 
 const listContacts = async (req, res) => {
-  const { page = 1, limit = 20, favorite } = req.query;
-  const skip = (page - 1) * limit;
-
   const { _id: owner } = req.user;
 
-  const allContacts = Contact.find({ owner }, "-updatedAt", {
-    skip,
-    limit,
-  }).populate("owner", "name email");
+  const { page = 1, limit = 20, favorite, name } = req.query;
+  const skip = (page - 1) * limit;
 
-  const count = await Contact.count();
-
-  if (favorite) {
-    const favoriteToBoolean = Boolean(+favorite);
-    allContacts.where("favorite").equals(favoriteToBoolean);
+  const query = { owner };
+  if (favorite !== undefined) {
+    query.favorite = favorite;
   }
 
-  const contacts = await allContacts.exec();
+  if (name !== undefined) {
+    query.name = name;
+  }
+
+  const allContacts = await Contact.find({ ...query }, "-updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "email subscription");
+
+  const count = allContacts.length;
 
   res.status(200).json({
     status: "success",
     code: 200,
     data: {
-      result: contacts,
+      result: allContacts,
       page,
       limit,
       count,

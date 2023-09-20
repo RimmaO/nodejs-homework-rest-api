@@ -68,9 +68,21 @@ const current = async (req, res) => {
   });
 };
 
+const updateSubscriptionUser = async (req, res) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+  await User.findByIdAndUpdate(_id, { subscription });
+
+  res.status(200).json({
+    _id,
+    subscription,
+  });
+};
+
 module.exports = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   current: ctrlWrapper(current),
   logout: ctrlWrapper(logout),
+  updateSubscriptionUser: ctrlWrapper(updateSubscriptionUser),
 };

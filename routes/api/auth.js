@@ -17,6 +17,10 @@ router.patch(
   authenticate,
   upload.single("avatar"),
   ctrl.updateAvatar
+  "/subscription",
+  authenticate,
+  validateBody(schemas.subscriptionSchema),
+  ctrl.updateSubscriptionUser
 );
 
 module.exports = router;

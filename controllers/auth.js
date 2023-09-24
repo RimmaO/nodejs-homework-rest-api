@@ -98,6 +98,16 @@ const updateAvatar = async (req, res) => {
   await User.findByIdAndUpdate(_id, { avatarURL });
 
   res.status(200).json({ avatarURL });
+  
+const updateSubscriptionUser = async (req, res) => {
+  const { _id } = req.user;
+  const { subscription } = req.body;
+  await User.findByIdAndUpdate(_id, { subscription });
+
+  res.status(200).json({
+    _id,
+    subscription,
+  });
 };
 
 module.exports = {
@@ -106,4 +116,5 @@ module.exports = {
   current: ctrlWrapper(current),
   logout: ctrlWrapper(logout),
   updateAvatar: ctrlWrapper(updateAvatar),
+  updateSubscriptionUser: ctrlWrapper(updateSubscriptionUser),
 };

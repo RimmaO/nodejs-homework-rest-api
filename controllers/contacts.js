@@ -30,6 +30,7 @@ const listContacts = async (req, res) => {
       result: allContacts,
       page,
       limit,
+      count,
     },
   });
 };

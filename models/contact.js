@@ -62,7 +62,6 @@ const contactsPatchSchema = Joi.object({
 
 const contactFilterFavoriteSchema = {
   favorite: Joi.number().valid(0, 1),
-  // favorite: Joi.boolean(),
 };
 
 const schemas = {

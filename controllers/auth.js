@@ -6,7 +6,8 @@ const fs = require("fs/promises");
 const Jimp = require("jimp");
 
 const { User } = require("../models/user");
-const { ctrlWrapper } = require("../helpers");
+const { ctrlWrapper, sendEmail } = require("../helpers");
+const { nanoid } = require("nanoid");
 const { SECRET_KEY } = process.env;
 require("dotenv").config();
 
@@ -20,13 +21,25 @@ const register = async (req, res) => {
     error.status = 409;
     throw error;
   }
+
+  const verificationToken = nanoid();
+
   const hashPassword = await bcrypt.hash(password, 10);
   const avatarURL = gravatar.url(email);
+
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
+
+  const mail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="http://localhost:3000/api/auth/verify/${verificationToken}">Follow link for verify email<a>`,
+  };
+  await sendEmail(mail);
 
   res.status(201).json({
     user: {
@@ -34,6 +47,49 @@ const register = async (req, res) => {
       email: newUser.email,
       subscription: newUser.subscription,
     },
+  });
+};
+
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    const error = new Error("User not found");
+    error.status = 404;
+    throw error;
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: null,
+  });
+
+  res.status(200).json({ message: "Verification successful" });
+};
+
+const verifyResend = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    const error = new Error("Missing required field email");
+    error.status = 400;
+    throw error;
+  }
+  if (user.verify) {
+    const error = new Error("Verification has already been passed");
+    error.status = 400;
+    throw error;
+  }
+
+  const mail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="http://localhost:3000/api/auth/verify/${user.verificationToken}">Follow link for verify email<a>`,
+  };
+  await sendEmail(mail);
+
+  res.status(200).json({
+    message: "Verification email sent",
   });
 };
 
@@ -45,6 +101,13 @@ const login = async (req, res) => {
     error.status = 401;
     throw error;
   }
+
+  if (!user.verify) {
+    const error = new Error("User not found");
+    error.status = 404;
+    throw error;
+  }
+
   const passwordCompare = await bcrypt.compare(password, user.password);
   if (!passwordCompare) {
     const error = new Error("Email or password is wrong");
@@ -98,7 +161,8 @@ const updateAvatar = async (req, res) => {
   await User.findByIdAndUpdate(_id, { avatarURL });
 
   res.status(200).json({ avatarURL });
-  
+};
+
 const updateSubscriptionUser = async (req, res) => {
   const { _id } = req.user;
   const { subscription } = req.body;
@@ -112,6 +176,8 @@ const updateSubscriptionUser = async (req, res) => {
 
 module.exports = {
   register: ctrlWrapper(register),
+  verifyEmail: ctrlWrapper(verifyEmail),
+  verifyResend: ctrlWrapper(verifyResend),
   login: ctrlWrapper(login),
   current: ctrlWrapper(current),
   logout: ctrlWrapper(logout),

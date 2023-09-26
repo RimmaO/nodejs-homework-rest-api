@@ -17,10 +17,17 @@ router.patch(
   authenticate,
   upload.single("avatar"),
   ctrl.updateAvatar
+);
+
+router.patch(
   "/subscription",
   authenticate,
   validateBody(schemas.subscriptionSchema),
   ctrl.updateSubscriptionUser
 );
+
+router.get("/verify/:verificationToken", ctrl.verifyEmail);
+
+router.post("/verify", ctrl.verifyResend);
 
 module.exports = router;

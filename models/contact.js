@@ -60,15 +60,10 @@ const contactsPatchSchema = Joi.object({
   favorite: Joi.boolean().required(),
 });
 
-const contactFilterFavoriteSchema = {
-  favorite: Joi.number().valid(0, 1),
-};
-
 const schemas = {
   contactsAddSchema,
   contactsPutSchema,
   contactsPatchSchema,
-  contactFilterFavoriteSchema,
 };
 
 module.exports = { Contact, schemas };
